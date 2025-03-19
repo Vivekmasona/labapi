@@ -1,15 +1,21 @@
 {
-  "name": "elevenlabs-api",
+  "name": "tts-elevenlabs",
   "version": "1.0.0",
-  "description": "A Node.js API for ElevenLabs voice agent using Express",
-  "main": "server.js",
+  "description": "Text-to-Speech API using ElevenLabs with Express and TypeScript",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "vercel-start": "node server.js"
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5"
+    "axios": "^1.6.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.9",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   }
 }
