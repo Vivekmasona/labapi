@@ -1,37 +1,50 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+import express, { Request, Response } from 'express';
+import axios from 'axios';
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const PORT = 3000;
 
-app.post("/generate", (req, res) => {
-    const { content } = req.body; // Client se aane wala content
+const ELEVENLABS_API_KEY = 'sk_3e56cc371edd52a93082ed6e63b0d57273bd84a78f6e3305'; // अपनी API Key डालें
+const VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // ElevenLabs की कोई भी Voice ID डालें
 
-    const htmlResponse = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ElevenLabs Voice Agent</title>
-    </head>
-    <body>
-        <h1>Generated Page</h1>
-        <p>${content}</p>
-        
-        <elevenlabs-convai agent-id="cqldvRaqnFa6lgvRN6In"></elevenlabs-convai>
-        <script src="https://cdn.jsdelivr.net/gh/Vivekmasona/vfytts/2.js" async type="text/javascript"></script>
-    </body>
-    </html>
-    `;
+app.get('/tts/v2', async (req: Request, res: Response) => {
+    const text: string | undefined = req.query.text as string;
 
-    res.send(htmlResponse);
+    if (!text) {
+        return res.status(400).json({ error: 'Text query parameter is required' });
+    }
+
+    try {
+        const response = await axios.post(
+            `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+            {
+                text: text,
+                model_id: 'eleven_monolingual_v1',
+                voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.5
+                }
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'xi-api-key': ELEVENLABS_API_KEY
+                },
+                responseType: 'stream' // Stream response for direct piping
+            }
+        );
+
+        // Set headers for file download
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Content-Disposition', 'attachment; filename="vivek_masona_ai.mp3"');
+
+        // Pipe the audio stream directly to the client for instant download
+        response.data.pipe(res);
+    } catch (error: any) {
+        console.error('Error generating TTS:', error.response?.data || error.message);
+        res.status(500).json({ error: 'Voice synthesis failed' });
+    }
 });
 
-// Server ko start karna
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// Vercel के लिए Handler
+export default app;
