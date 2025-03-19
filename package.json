@@ -1,0 +1,15 @@
+{
+  "name": "elevenlabs-api",
+  "version": "1.0.0",
+  "description": "A Node.js API for ElevenLabs voice agent using Express",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "vercel-start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  }
+}
