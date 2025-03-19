@@ -1,15 +1,14 @@
 const express = require("express");
 const axios = require("axios");
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ElevenLabs API Credentials
 const ELEVENLABS_API_KEY = "sk_3e56cc371edd52a93082ed6e63b0d57273bd84a78f6e3305";
-const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Voice ID
+const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
 
 app.get("/ai", async (req, res) => {
     const text = req.query.text;
@@ -22,8 +21,8 @@ app.get("/ai", async (req, res) => {
                 text: text,
                 model_id: "eleven_monolingual_v1",
                 voice_settings: {
-                    stability: 0.8,
-                    similarity_boost: 0.8
+                    stability: 0.5,
+                    similarity_boost: 0.5
                 }
             },
             {
@@ -35,8 +34,6 @@ app.get("/ai", async (req, res) => {
             }
         );
 
-        console.log("API Response:", response.status, response.headers);
-        
         if (response.status !== 200) {
             return res.status(500).json({ error: "Failed to generate speech." });
         }
@@ -54,6 +51,6 @@ app.get("/ai", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-module.exports = app;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
