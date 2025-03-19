@@ -1,20 +1,25 @@
 const express = require("express");
 const axios = require("axios");
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const ELEVENLABS_API_KEY = "sk_3e56cc371edd52a93082ed6e63b0d57273bd84a78f6e3305";
-const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
+// 📌 API Key और Voice ID को Environment Variables से लीजिए (या सीधे डालें)
+const ELEVENLABS_API_KEY = "sk_3e56cc371edd52a93082ed6e63b0d57273bd84a78f6e3305"; // 👈 अपनी API Key डालें
+const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"; // 👈 अपनी पसंद की Voice ID डालें
 
+app.get("/", (req, res) => {
+    res.send("ElevenLabs TTS API is running!");
+});
+
+// 🎙️ **Text-to-Speech API**
 app.get("/ai", async (req, res) => {
     const text = req.query.text;
     if (!text) return res.status(400).json({ error: "Please provide text as a query parameter." });
 
     try {
+        console.log("🔹 Generating speech for:", text); // ✅ Debug Log
+
         const response = await axios.post(
             `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
             {
@@ -34,23 +39,28 @@ app.get("/ai", async (req, res) => {
             }
         );
 
+        console.log("✅ ElevenLabs Response Status:", response.status);
+
         if (response.status !== 200) {
+            console.error("❌ ElevenLabs API Error:", response.data);
             return res.status(500).json({ error: "Failed to generate speech." });
         }
 
-        const randomDigits = crypto.randomInt(10000, 99999);
-        const filename = `Vivekfy_AI_${randomDigits}.mp3`;
-        const filePath = path.join(__dirname, filename);
+        // 📌 MP3 File का नाम Random Generate करें
+        const fileName = `Vivekfy_ai_${Math.floor(1000 + Math.random() * 9000)}.mp3`;
 
-        fs.writeFileSync(filePath, response.data);
-        res.download(filePath, filename, () => fs.unlinkSync(filePath));
+        // 🎵 MP3 File Return करें
+        res.setHeader("Content-Type", "audio/mpeg");
+        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+        res.send(response.data);
 
     } catch (error) {
-        console.error("Error:", error.response ? error.response.data : error.message);
+        console.error("❌ Error in API:", error.response ? error.response.data : error.message);
         res.status(500).json({ error: "Failed to generate speech." });
     }
 });
 
+// 🚀 Server Start करें
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
