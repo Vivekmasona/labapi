@@ -16,7 +16,6 @@ app.get("/ai", async (req, res) => {
     if (!text) return res.status(400).json({ error: "Please provide text as a query parameter." });
 
     try {
-        // Request to ElevenLabs API
         const response = await axios.post(
             `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
             {
@@ -36,22 +35,21 @@ app.get("/ai", async (req, res) => {
             }
         );
 
-        // Generate random filename
+        console.log("API Response:", response.status, response.headers);
+        
+        if (response.status !== 200) {
+            return res.status(500).json({ error: "Failed to generate speech." });
+        }
+
         const randomDigits = crypto.randomInt(10000, 99999);
         const filename = `Vivekfy_AI_${randomDigits}.mp3`;
         const filePath = path.join(__dirname, filename);
 
-        // Save the file locally
         fs.writeFileSync(filePath, response.data);
-
-        // Send file for download
-        res.download(filePath, filename, (err) => {
-            if (err) console.error("Download error:", err);
-            fs.unlinkSync(filePath); // Delete file after download
-        });
+        res.download(filePath, filename, () => fs.unlinkSync(filePath));
 
     } catch (error) {
-        console.error("TTS API Error:", error);
+        console.error("Error:", error.response ? error.response.data : error.message);
         res.status(500).json({ error: "Failed to generate speech." });
     }
 });
