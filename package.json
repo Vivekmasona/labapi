@@ -1,12 +1,17 @@
 {
-  "name": "wolfram-alpha-scraper",
+  "name": "wolfram-alpha-vercel",
   "version": "1.0.0",
-  "description": "A Node.js server to scrape Wolfram Alpha results using Puppeteer",
-  "main": "index.js",
+  "description": "A Node.js serverless function to scrape Wolfram Alpha using Puppeteer on Vercel",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
-    "puppeteer": "^21.3.8"
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^21.3.8"
+  },
+  "devDependencies": {
+    "vercel": "^28.10.1"
   }
 }
