@@ -1,7 +1,7 @@
 const http = require("http");
-const https = require("https");
+const puppeteer = require("puppeteer");
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     if (!req.url.startsWith("/calculate?q=")) {
         res.writeHead(404, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: "Invalid endpoint" }));
@@ -14,20 +14,30 @@ const server = http.createServer((req, res) => {
         return res.end(JSON.stringify({ error: "Query missing" }));
     }
 
-    let googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}+site:wolframalpha.com`;
+    let url = `https://www.wolframalpha.com/input/?i=${encodeURIComponent(query)}`;
 
-    https.get(googleUrl, { headers: { "User-Agent": "Mozilla/5.0" } }, (response) => {
-        let data = "";
+    try {
+        const browser = await puppeteer.launch({ headless: "new" });
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: "domcontentloaded" });
 
-        response.on("data", (chunk) => (data += chunk));
-        response.on("end", () => {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ query, answer: `Check: ${googleUrl}` }));
+        // Wait for Wolfram answer to load
+        await page.waitForSelector(".pod", { timeout: 5000 });
+
+        // Extract the result
+        let answer = await page.evaluate(() => {
+            let el = document.querySelector(".pod .output p");
+            return el ? el.innerText.trim() : "No result found!";
         });
-    }).on("error", (err) => {
+
+        await browser.close();
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ query, answer }));
+    } catch (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Failed to fetch result" }));
-    });
+        res.end(JSON.stringify({ error: "Failed to fetch result", details: error.message }));
+    }
 });
 
 server.listen(3000, () => console.log("Server running on port 3000"));
