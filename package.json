@@ -1,23 +1,14 @@
 {
-  "name": "elevenlabs-tts",
+  "name": "search-calculator",
   "version": "1.0.0",
-  "description": "A Node.js API to generate high-quality speech using ElevenLabs and provide an MP3 download.",
+  "description": "A simple Node.js proxy server for fetching search results",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "vercel-start": "vercel dev"
+    "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "crypto": "^1.0.1",
     "express": "^4.18.2",
-    "fs": "0.0.1-security",
-    "path": "^0.12.7"
-  },
-  "engines": {
-    "node": ">=16"
-  },
-  "keywords": ["tts", "text-to-speech", "elevenlabs", "mp3", "vercel"],
-  "author": "Vivekfy",
-  "license": "MIT"
+    "axios": "^1.4.0",
+    "cors": "^2.8.5"
+  }
 }
