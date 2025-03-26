@@ -1,6 +1,5 @@
 const http = require("http");
 const https = require("https");
-const cheerio = require("cheerio");
 
 const server = http.createServer((req, res) => {
     if (!req.url.startsWith("/calculate?q=")) {
@@ -15,18 +14,15 @@ const server = http.createServer((req, res) => {
         return res.end(JSON.stringify({ error: "Query missing" }));
     }
 
-    let url = `https://www.wolframalpha.com/input/?i=${encodeURIComponent(query)}`;
+    let googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}+site:wolframalpha.com`;
 
-    https.get(url, { headers: { "User-Agent": "Mozilla/5.0" } }, (response) => {
+    https.get(googleUrl, { headers: { "User-Agent": "Mozilla/5.0" } }, (response) => {
         let data = "";
 
         response.on("data", (chunk) => (data += chunk));
         response.on("end", () => {
-            let $ = cheerio.load(data);
-            let answer = $(".pod").first().find(".output p").text().trim();
-
             res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ query, answer: answer || "No result found!" }));
+            res.end(JSON.stringify({ query, answer: `Check: ${googleUrl}` }));
         });
     }).on("error", (err) => {
         res.writeHead(500, { "Content-Type": "application/json" });
