@@ -1,34 +1,35 @@
 const express = require("express");
 const axios = require("axios");
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 📌 API Key और Voice ID को Environment Variables से लीजिए (या सीधे डालें)
-const ELEVENLABS_API_KEY = "sk_0a0dac7711dd1bb95c80490f48395c1da38d862fe81757fa"; // 👈 अपनी API Key डालें
-const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"; // 👈 अपनी पसंद की Voice ID डालें
+// 🔹 ElevenLabs API Details (Replace with Your API Key)
+const ELEVENLABS_API_KEY = "sk_0a0dac7711dd1bb95c80490f48395c1da38d862fe81757fa"; 
+const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Default ElevenLabs Voice ID
 
+app.use(cors()); // ✅ Fix CORS issues
+
+// 🔹 Test Route
 app.get("/", (req, res) => {
-    res.send("ElevenLabs TTS API is running!");
+    res.send("✅ ElevenLabs TTS API is Running!");
 });
 
-// 🎙️ **Text-to-Speech API**
-app.get("/ai", async (req, res) => {
+// 🎙️ **Text-to-Speech Route**
+app.get("/tts", async (req, res) => {
     const text = req.query.text;
-    if (!text) return res.status(400).json({ error: "Please provide text as a query parameter." });
+    if (!text) return res.status(400).json({ error: "❌ Please provide text as a query parameter." });
 
     try {
-        console.log("🔹 Generating speech for:", text); // ✅ Debug Log
+        console.log("🔹 Converting Text to Speech:", text);
 
         const response = await axios.post(
-            `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+            `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream`,
             {
                 text: text,
                 model_id: "eleven_monolingual_v1",
-                voice_settings: {
-                    stability: 0.5,
-                    similarity_boost: 0.5
-                }
+                voice_settings: { stability: 0.5, similarity_boost: 0.5 }
             },
             {
                 headers: {
@@ -39,28 +40,20 @@ app.get("/ai", async (req, res) => {
             }
         );
 
-        console.log("✅ ElevenLabs Response Status:", response.status);
+        console.log("✅ API Response Status:", response.status);
 
-        if (response.status !== 200) {
-            console.error("❌ ElevenLabs API Error:", response.data);
-            return res.status(500).json({ error: "Failed to generate speech." });
-        }
-
-        // 📌 MP3 File का नाम Random Generate करें
-        const fileName = `Vivekfy_ai_${Math.floor(1000 + Math.random() * 9000)}.mp3`;
-
-        // 🎵 MP3 File Return करें
+        // 🎵 Send MP3 File
         res.setHeader("Content-Type", "audio/mpeg");
-        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+        res.setHeader("Content-Disposition", 'attachment; filename="tts_audio.mp3"');
         res.send(response.data);
 
     } catch (error) {
-        console.error("❌ Error in API:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Failed to generate speech." });
+        console.error("❌ Error:", error.response ? error.response.data : error.message);
+        res.status(500).json({ error: "❌ Failed to generate speech." });
     }
 });
 
-// 🚀 Server Start करें
+// 🚀 Start Server
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
