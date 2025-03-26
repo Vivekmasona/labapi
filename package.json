@@ -1,15 +1,12 @@
 {
-  "name": "wolfram-calculator",
+  "name": "wolfram-alpha-scraper",
   "version": "1.0.0",
-  "description": "A Node.js proxy server for Wolfram Alpha",
+  "description": "A Node.js server to scrape Wolfram Alpha results using Puppeteer",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "axios": "^1.4.0",
-    "cors": "^2.8.5",
-    "cheerio": "^1.0.0-rc.12"
+    "puppeteer": "^21.3.8"
   }
 }
