@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 📌 API Key और Voice ID को Environment Variables से लीजिए (या सीधे डालें)
-const ELEVENLABS_API_KEY = "sk_3e56cc371edd52a93082ed6e63b0d57273bd84a78f6e3305"; // 👈 अपनी API Key डालें
+const ELEVENLABS_API_KEY = "sk_b3adcce5b079c2c6c96347892f2c8a711872d7dd4c4b8e82"; // 👈 अपनी API Key डालें
 const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"; // 👈 अपनी पसंद की Voice ID डालें
 
 app.get("/", (req, res) => {
